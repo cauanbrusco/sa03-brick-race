@@ -113,7 +113,8 @@ namespace BrickRace
             {
                 if (!obstaculo.Ativo) continue;
 
-                obstaculo.Descer();
+                int incrementoVelocidade = Math.Max(1, (_nivel - 1) / 2);
+                obstaculo.Descer(1 + incrementoVelocidade);
 
                 bool chegouNaLinhaDeColisao = obstaculo.Linha == Constantes.LINHA_COLISAO;
 
@@ -171,10 +172,11 @@ namespace BrickRace
             {
                 _nivel = nivelCalculado;
 
-                int novaVelocidade = Constantes.VELOCIDADE_INICIAL_MS
-                    - (_nivel - 1) * Constantes.REDUCAO_VELOCIDADE_POR_NIVEL_MS;
+                int novaVelocidade = Math.Max(
+                    Constantes.VELOCIDADE_MINIMA_MS,
+                    Constantes.VELOCIDADE_INICIAL_MS - (_nivel - 1) * Constantes.REDUCAO_VELOCIDADE_POR_NIVEL_MS);
 
-                _velocidadeMs = Math.Max(novaVelocidade, Constantes.VELOCIDADE_MINIMA_MS);
+                _velocidadeMs = novaVelocidade;
                 EfeitosSonoros.TocarSubidaDeNivel();
             }
         }
