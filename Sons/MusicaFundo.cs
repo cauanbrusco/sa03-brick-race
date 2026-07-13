@@ -7,6 +7,7 @@ namespace BrickRace
     /// </summary>
     public static class MusicaDeFundo
     {
+        private static readonly object _sincronizacao = new();
         private static IWavePlayer? _player;
         private static WaveStream? _stream;
 
@@ -17,34 +18,41 @@ namespace BrickRace
                 return;
             }
 
-            Parar();
+            lock (_sincronizacao)
+            {
+                PararInterno();
 
-            var caminhoResolvido = ResolverCaminho(caminho);
-            if (string.IsNullOrWhiteSpace(caminhoResolvido))
-            {
-                return;
-            }
+                var caminhoResolvido = ResolverCaminho(caminho);
+                if (string.IsNullOrWhiteSpace(caminhoResolvido))
+                {
+                    return;
+                }
 
-            try
-            {
-                _stream = new LoopStream(new AudioFileReader(caminhoResolvido));
-                _player = new WaveOutEvent();
-                _player.Init(_stream);
-                _player.Play();
-            }
-            catch
-            {
-                Parar();
+                try
+                {
+                    _stream = new LoopStream(new AudioFileReader(caminhoResolvido));
+                    _player = new WaveOutEvent();
+                    _player.Init(_stream);
+                    _player.Play();
+                }
+                catch
+                {
+                    PararInterno();
+                }
             }
         }
 
         public static void Parar()
         {
-            if (_player is not null)
+            lock (_sincronizacao)
             {
-                _player.Stop();
+                PararInterno();
             }
+        }
 
+        private static void PararInterno()
+        {
+            _player?.Stop();
             _stream?.Dispose();
             _stream = null;
             _player?.Dispose();

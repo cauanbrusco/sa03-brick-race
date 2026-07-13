@@ -9,26 +9,18 @@ namespace BrickRace
     {
         public static void TocarColisao()
         {
-            TocarSemBloquear(() => ReproduzirArquivo(Constantes.CAMINHO_SOM_PERDA_VIDA));
+            ReproduzirArquivo(Constantes.CAMINHO_SOM_PERDA_VIDA);
         }
 
         public static void TocarSubidaDeNivel()
         {
-            TocarSemBloquear(() => ReproduzirArquivo(Constantes.CAMINHO_TRILHA_SONORA));
+            // Evita sobreposição com a trilha principal do jogo.
         }
 
         public static void TocarDerrota()
         {
             MusicaDeFundo.Parar();
-            TocarSemBloquear(() => ReproduzirArquivo(Constantes.CAMINHO_SOM_DERROTA));
-        }
-
-        private static void TocarSemBloquear(Action efeito)
-        {
-            _ = Task.Run(() =>
-            {
-                efeito();
-            });
+            ReproduzirArquivo(Constantes.CAMINHO_SOM_DERROTA);
         }
 
         private static void ReproduzirArquivo(string caminho)
